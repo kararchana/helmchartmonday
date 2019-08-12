@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: helmchartmonday-master
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: helmchartmonday
+  template:
+    metadata:
+      labels:
+        app: helmchartmonday
+    spec:
+      containers:
+      - name: helmchartmonday
+        image: helmchartmondaycontainer.azurecr.io/bhanu9505508737/helmchartmonday:#{Build.BuildId}#
+        ports:
+        - containerPort: 80
+        env:
+          - name: PODNAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+      imagePullSecrets:
+      - name: bhanu258737
