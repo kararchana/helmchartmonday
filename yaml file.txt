@@ -1,11 +1,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: emailservice-deployment     #name of the application(change the "emailservice" with the name of your application)
+  name: helmchartmonday-deployment     
 spec:
   selector:
     matchLabels:
-      app: emailservice
+      app: helmchartmonday
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -15,11 +15,11 @@ spec:
   template:
     metadata:
       labels:
-        app: emailservice
+        app: helmchartmonday
     spec:
       containers:
-      - name: emailservice
-        image: samplecontainer11.azurecr.io/kararchana/emailservice:#{Build.BuildId}#                    #ACR loginservername/github application path 
+      - name: helmchartmonday
+        image: samplecontainer11.azurecr.io/kararchana/helmchartmonday:#{Build.BuildId}#                    #ACR loginservername/github application path 
         imagePullPolicy: Always
         ports:
         - containerPort: 80
@@ -36,43 +36,41 @@ spec:
               fieldRef:
                 fieldPath: metadata.name
       imagePullSecrets:
-      - name: akssec
+      - name: demoaks
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: emailservice
+  name: helmchartmonday
 spec:
   type: LoadBalancer
   ports:
   - port: 80
     targetPort: 9001
   selector:
-    app: emailservice
+    app: helmchartmonday
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: emailservice
+  name: helmchartmonday
   annotations:
     kubernetes.io/ingress.class: addon-http-application-routing
 spec:
   rules:
-  - host: emailservice.8d00e524230642a99b15.westus.aksapp.io                                          
+  - host: helmchartmonday.8d00e524230642a99b15.westus.aksapp.io                                          
     http:
       paths:
       - backend:
-          serviceName: emailservice
+          serviceName: helmchartmonday
           servicePort: 80
         path: /
 ---
 
-#For auto scalling 
-
 apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
-  name: emailservice
+  name: helmchartmonday
   namespace: default
 spec:
   minReplicas: 5
@@ -80,5 +78,5 @@ spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: emailservice-deployment
+    name: helmchartmonday-deployment
   targetCPUUtilizationPercentage: 10
